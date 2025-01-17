@@ -5,7 +5,7 @@ const API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/event
 
 const table = document.querySelector('#events');
 const form = document.querySelector('#addEvent');
-
+// const deleteButtonConst = document.querySelector('#events button');
 const state = {
   events: [],
 };
@@ -34,9 +34,10 @@ async function addEvent(event) {
     console.error(err);
   }
 }
+
 // display events on the page
 
-function renderEvents() {
+async function renderEvents() {
   if (!state.events.length) {
     table.innerHTML = `<p>No artists found</p>`;
     return;
@@ -57,9 +58,12 @@ function renderEvents() {
     eventLocation.innerText = event.location;
     row.appendChild(eventLocation);
 
+    const delContainer = document.createElement('td');
     const deleteButton = document.createElement('button');
+
     deleteButton.innerText = 'delete';
-    row.appendChild(deleteButton);
+    delContainer.appendChild(deleteButton);
+    row.appendChild(delContainer);
 
     console.log(row);
     return row;
@@ -87,4 +91,31 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
+// deleteButtonConst.addEventListener('submit', async (e) => {
+//   e.preventDefault();
+//   const delEvent = {
+//     id: form.eventName.value,
+//     name: form.eventName.value,
+//     description: form.description.value,
+//     date: form.eventDate.value,
+//     location: form.eventLocation.value,
+//   };
+//   const result = await deleteEvent(delEvent);
+//   if (result.success) {
+//     await getEvents();
+//     renderEvents();
+//   }
+// });
+
+// async function deleteEvent(event) {
+//   try {
+//     const response = await fetch(API_URL, {
+//       method: 'DELETE',
+//     });
+//     const json = await response.json();
+//     return json;
+//   } catch (err) {
+//     console.error(err);
+//   }
+// }
 render();
