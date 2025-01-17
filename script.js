@@ -15,9 +15,10 @@ const state = {
 async function getEvents() {
   const response = await fetch(API_URL);
   const json = await response.json();
-
+  // add data from fetch to the state.events array
   state.events = json.data;
-  console.log(state);
+  // console.log(state);
+  renderEvents();
   // TODO
 }
 
@@ -35,11 +36,30 @@ async function addEvent(event) {
   }
 }
 
+// delete event
+
+async function deleteEvent(eventId) {
+  try {
+    const response = await fetch(`${API_URL}/${eventId}`, {
+      method: 'DELETE',
+    });
+    const json = await response.json();
+    // if (json.success) {
+    //   console.log(`Event with ID: ${eventId} deleted successfully`);
+    // } else {
+    //   console.log(`Failed to delete event with ID: ${eventId}`);
+    // }
+  } catch (err) {
+    console.error(err);
+  }
+  // update events after deleting
+  await getEvents();
+}
 // display events on the page
 
 async function renderEvents() {
   if (!state.events.length) {
-    table.innerHTML = `<p>No artists found</p>`;
+    table.innerHTML = `<p>No events found</p>`;
     return;
   }
   const eventList = state.events.map((event) => {
@@ -60,20 +80,19 @@ async function renderEvents() {
 
     const delContainer = document.createElement('td');
     const deleteButton = document.createElement('button');
+    // add class to button for targeting
+    deleteButton.setAttribute('class', 'delete-button');
+    // add data-id to button for retrieving id of event
+    deleteButton.setAttribute('data-id', event.id);
 
-    deleteButton.innerText = 'delete';
+    deleteButton.innerText = 'Delete Event';
     delContainer.appendChild(deleteButton);
     row.appendChild(delContainer);
 
-    console.log(row);
+    // console.log(row);
     return row;
   });
   table.replaceChildren(...eventList);
-}
-
-async function render() {
-  await getEvents();
-  renderEvents();
 }
 
 form.addEventListener('submit', async (e) => {
@@ -85,37 +104,24 @@ form.addEventListener('submit', async (e) => {
     location: form.eventLocation.value,
   };
   const result = await addEvent(newEvent);
+  // adding event was successful
   if (result.success) {
     await getEvents();
-    renderEvents();
   }
 });
 
-// deleteButtonConst.addEventListener('submit', async (e) => {
-//   e.preventDefault();
-//   const delEvent = {
-//     id: form.eventName.value,
-//     name: form.eventName.value,
-//     description: form.description.value,
-//     date: form.eventDate.value,
-//     location: form.eventLocation.value,
-//   };
-//   const result = await deleteEvent(delEvent);
-//   if (result.success) {
-//     await getEvents();
-//     renderEvents();
-//   }
-// });
+table.addEventListener('click', async (e) => {
+  // listen to the table for a submit event
+  // if the submit event contained the class delete-button
+  if (e.target.classList.contains('delete-button')) {
+    // retrieve the id of the event to be deleted
+    const id = e.target.dataset.id;
+    // pass the ide to the deleteEvent function
+    await deleteEvent(id);
+  }
+});
 
-// async function deleteEvent(event) {
-//   try {
-//     const response = await fetch(API_URL, {
-//       method: 'DELETE',
-//     });
-//     const json = await response.json();
-//     return json;
-//   } catch (err) {
-//     console.error(err);
-//   }
-// }
+async function render() {
+  await getEvents();
+}
 render();
