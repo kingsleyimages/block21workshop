@@ -100,7 +100,7 @@ form.addEventListener('submit', async (e) => {
   const newEvent = {
     name: form.eventName.value,
     description: form.description.value,
-    date: form.eventDate.value,
+    date: new Date(form.eventDate.value).toISOString(),
     location: form.eventLocation.value,
   };
   const result = await addEvent(newEvent);
